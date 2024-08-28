@@ -3,7 +3,7 @@ from typing import List, Tuple, Coroutine, Union
 from src.utils.jit_funcs import nbabs
 from src.exchanges.bybit.post.order import Order
 from src.sharedstate import SharedState
-from src.strategy.ws_feeds.bybitprivatedata import log_event 
+from src.utils.logmeister import log_event
 class OMS:
     """
     Manages the order lifecycle for Bybit, including segregating, amending, and placing orders based on strategy needs.

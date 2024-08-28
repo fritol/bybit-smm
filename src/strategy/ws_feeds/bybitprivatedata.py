@@ -10,7 +10,7 @@ from src.exchanges.bybit.websockets.handlers.order import BybitOrderHandler
 from src.exchanges.bybit.websockets.handlers.position import BybitPositionHandler
 from src.exchanges.bybit.websockets.private import BybitPrivateWs
 from src.sharedstate import SharedState
-from src.strategy.ws_feeds.bybitprivatedata import log_event 
+from src.utils.logmeister import log_event
 class BybitPrivateData:
     """
     Manages private data streams from Bybit, including position, execution, and order updates.

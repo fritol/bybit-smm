@@ -8,7 +8,7 @@ from src.exchanges.binance.websockets.handlers.orderbook import BinanceBBAHandle
 from src.exchanges.binance.websockets.handlers.trades import BinanceTradesHandler
 from src.exchanges.binance.websockets.public import BinancePublicWs
 from src.sharedstate import SharedState
-from src.strategy.ws_feeds.bybitprivatedata import log_event 
+from src.utils.logmeister import log_event
 class BinanceMarketData:
     """
     Handles market data streams from Binance, including order book, BBA, and trades.

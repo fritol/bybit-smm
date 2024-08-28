@@ -5,7 +5,7 @@ from src.exchanges.bybit.post.client import BybitPrivatePostClient
 from src.exchanges.bybit.endpoints import PrivatePostLinks
 from src.exchanges.bybit.post.types import BybitFormats
 from src.sharedstate import SharedState
-from src.strategy.ws_feeds.bybitprivatedata import log_event 
+from src.utils.logmeister import log_event
 
 class Order:
     """

@@ -11,7 +11,7 @@ from src.exchanges.bybit.websockets.handlers.ticker import BybitTickerHandler
 from src.exchanges.bybit.websockets.handlers.trades import BybitTradesHandler
 from src.exchanges.bybit.websockets.public import BybitPublicWs
 from src.sharedstate import SharedState
-from src.strategy.ws_feeds.bybitprivatedata import log_event 
+from src.utils.logmeister import log_event
 class BybitMarketData:
     """
     Manages market data streams from Bybit, including order book, BBA, trades, ticker, and kline.

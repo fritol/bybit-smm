@@ -1,0 +1,523 @@
+[33mcommit 3f787666d29c9ad3f078b9c9df04cad1576fd917[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtestb[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/error-handling-improvements[m[33m, [m[1;31mbybit-smm/main[m[33m, [m[1;31mbybit-smm/error-handling-improvements[m[33m, [m[1;32mmaster[m[33m, [m[1;32mmain[m[33m, [m[1;32merror-handling-improvements[m[33m)[m
+Author: fri tol <4304520+fritol@users.noreply.github.com>
+Date:   Wed Aug 28 15:08:37 2024 +0200
+
+    added basic logger, wrapped some methods for err handling/loggin
+
+[33mcommit 56c803b25b836de459f6876b96f473b7c7cea82c[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sat Apr 20 13:45:17 2024 +0100
+
+    add UTA requirement
+
+[33mcommit beb1c59d26e7ed490dba5e7b383303282c934d7b[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Mar 13 17:00:20 2024 +0000
+
+    fix None indexing error bug
+
+[33mcommit 22d208dc15ab97b1165d0600c94d32c820699756[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Mar 13 16:59:47 2024 +0000
+
+    fix None indexing bug
+
+[33mcommit d88949240720827f909a8ef108bde7e2584edf6a[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Feb 25 01:42:18 2024 +0000
+
+    add: reloading safety
+
+[33mcommit 8da22bc6cb13a2b14e661c487e60b4a4258ce93d[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Feb 25 01:28:54 2024 +0000
+
+    add: new features + updated weights
+
+[33mcommit dfeae3c0dd0538d9854a67693c143d8e338fce73[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Feb 25 01:28:25 2024 +0000
+
+    add: docstring
+
+[33mcommit 87a478828671627bbfd6efd90671b3e7584441e8[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Feb 25 01:27:51 2024 +0000
+
+    add: simple trades imbalance
+
+[33mcommit 2ed1d3fd463722fa7932166b86b7a4fdf36997c8[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Feb 25 01:27:44 2024 +0000
+
+    add: simple orderbook imbalance
+
+[33mcommit 39b32ad38055c604f60afba1db0af65cc7d3ef5f[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Feb 25 01:15:46 2024 +0000
+
+    warn: backtracked changes
+
+[33mcommit cf9e1a275fb2ea15c2e996d22fa020014e49170e[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Feb 25 01:07:14 2024 +0000
+
+    del: depreciated
+
+[33mcommit 3b2d904d7bd98d400bc268ddc0804865da844aa0[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Feb 25 01:06:54 2024 +0000
+
+    add: heavier alpha + ema_weights
+
+[33mcommit f51e521c563dab6f4faa1a0cf909d6a6c5322de5[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Feb 25 01:05:58 2024 +0000
+
+    fix: incorrect comments
+
+[33mcommit 9030149c0cd4e381b54a1b18c2cbfb534696a654[m
+Merge: e2c6669 ff6a8a1
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Thu Feb 22 00:55:59 2024 +0000
+
+    Merge pull request #14 from beatzxbt/main-v1.1
+    
+    bug fixes, speed upgrades, easier to use & lots of docstrings!
+
+[33mcommit ff6a8a16226e5d9968b9d52ccbee668b42fb3b8f[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 23:24:34 2024 +0000
+
+    rename: quote_offset -> price_offset
+
+[33mcommit fc1a3f50ea47cf55832130529469cb29b330afd7[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 22:34:03 2024 +0000
+
+    add: new default settings
+
+[33mcommit 8960d0ef457ef1ab55eabed905c0f96d48c29e12[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 22:30:10 2024 +0000
+
+    add: produced .env ignored
+
+[33mcommit c516ede2b6a78cf8083421c38f546ce915ce8c21[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 22:28:33 2024 +0000
+
+    add: rearrange imports
+
+[33mcommit 90e5654daf83e7aa692369fc8b045f6fd538f260[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 22:28:18 2024 +0000
+
+    fix: .to_list() removed
+
+[33mcommit 36815e26755befade35e93ab17007aae9a375ecf[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 22:26:41 2024 +0000
+
+    add: disable debug mode
+
+[33mcommit af1fdffbe3eb3e6714b68123981a9620dbe8cf6b[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 22:26:21 2024 +0000
+
+    add: reduce refresh timer
+
+[33mcommit dec45a27ec76ac624bbf0ef5bf970969f6601663[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 22:03:40 2024 +0000
+
+    Update README.md
+
+[33mcommit 3fbb3e48af1236696577d07632a11d40bb3a7de8[m
+Merge: abd22d5 cb1806b
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 22:02:59 2024 +0000
+
+    Merge pull request #13 from mkapuza/mean-v1.2
+    
+    add: improve onboarding experience
+
+[33mcommit cb1806ba1a0d328f3912ba2ca586d1c8be2b216d[m
+Merge: 7c64660 abd22d5
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 22:02:14 2024 +0000
+
+    Merge branch 'main-v1.1' into mean-v1.2
+
+[33mcommit 7c646604020356a3130634cdbc42ead4fa7a75e9[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 17:26:53 2024 +0100
+
+    add: improve onboarding experience
+
+[33mcommit abd22d59d776560573f054755ef968064f63f406[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 14:55:56 2024 +0000
+
+    add: v1.1
+
+[33mcommit 60f4216e80e7a0e8a67d36092aad0860636c1faa[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 14:49:59 2024 +0000
+
+    add: reformat fns + fix types
+
+[33mcommit 9c4761b01bc0dbc26c97894b8ba7bc6b760030ca[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 04:40:41 2024 +0000
+
+    add: shutdown seq notice
+
+[33mcommit 0f76bef1a10713cd8f61d1c2ee322c7d8af353f2[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Feb 21 04:36:38 2024 +0000
+
+    add: docstrings
+
+[33mcommit ffcd022658553ca05f8ffe60b70c6bd9939b4df1[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 15:41:53 2024 +0000
+
+    add: feature class
+
+[33mcommit 46f684c5488a35df2b57f16ac54eb6b49860d075[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 15:41:43 2024 +0000
+
+    del: remove num_orders + add docstring
+
+[33mcommit 676201b1c09757db54fa981233f89cb1bd944819[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 15:23:23 2024 +0000
+
+    ---
+
+[33mcommit 85bb0d41935516557ad11edcb7ab4cd33d51cfdf[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:36:50 2024 +0000
+
+    add: docstrings + tick/lot size warmup
+
+[33mcommit aa8d7b897aa533057ee86cd58a767fe943d332ac[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:36:11 2024 +0000
+
+    add: cleaner side checking
+
+[33mcommit ea2a4992c0b288610cf9769f4fba1e5fff76573e[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:36:00 2024 +0000
+
+    add: simplified oms (bypassed atm)
+
+[33mcommit 7c5d4583450234f02fdc57e20c6bc0ae155178c9[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:35:36 2024 +0000
+
+    add: faster ws warmup checker
+
+[33mcommit 6fdeb537f721ab00a4cd5e39d7a34308f551312b[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:35:13 2024 +0000
+
+    add: nbgeomspace
+
+[33mcommit 863bb56a05d4b66a2ef9a9af295d9bdb7788c4d9[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:34:58 2024 +0000
+
+    del: limit order chase
+
+[33mcommit 14d26863e630510acdfa04d56e6780537ddd3425[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:34:47 2024 +0000
+
+    add: speed upgrades
+
+[33mcommit d90beb37b6e2a1a05c5d27e3259c826384f3708c[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:26:17 2024 +0000
+
+    add: misc changes
+
+[33mcommit 111320a45a8ee4bdfd27733fa8e0f1f91f012a16[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:25:34 2024 +0000
+
+    add: docstrings + cleaner code flow
+
+[33mcommit 61f9a0c2351535c536fe6e63cfe29de5a12aa668[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:08:53 2024 +0000
+
+    add: instrument info
+
+[33mcommit 528d860d36e61e7c6b63b8bb0e5bc089d4a7ab60[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:08:31 2024 +0000
+
+    del: unused settings + cleaner comments
+
+[33mcommit e923358085fb7702cc259cac8f02df8f25598425[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:07:58 2024 +0000
+
+    add: uvloop eventloop
+
+[33mcommit f7dd0007c8f09d0f4792c9788028e4dc2a6ece93[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Feb 20 14:07:07 2024 +0000
+
+    add: remove old settings + added vamp
+
+[33mcommit e2c666942afd61f181b0a3d788623af8e270cb59[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Jan 24 00:23:34 2024 +0000
+
+    add: bug warning
+
+[33mcommit 723bf5edcc9c13d1960872031f5a1f7c41a2d205[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Fri Dec 8 03:03:47 2023 +0000
+
+    fix: ob size mem leak
+    
+    added a (1000) max limit for orderbook levels on either side, preventing mem leak
+    
+    unlikely that one will require more than that, but can increase the limit as required
+
+[33mcommit ffdcb46d4987c3c4c5bd608471e5b233de5a98b6[m
+Merge: 1de60c4 087c931
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Mon Sep 25 17:21:08 2023 +0100
+
+    Merge pull request #6 from wick-coder/main
+    
+    added dsstore
+
+[33mcommit 087c931a7fb27189e494d136915ea5f8224fbfdf[m
+Author: wick-coder <141282572+wick-coder@users.noreply.github.com>
+Date:   Sat Sep 23 19:04:35 2023 -0700
+
+    Update .gitignore
+    
+    improve OPSEC
+
+[33mcommit 1de60c4842ad6658bbf8784489dcd99bea3f0396[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Sep 20 10:16:29 2023 +0100
+
+    fixed zero div error on bba
+    
+    bybit sends 0 qty to specify a level as finished, occasionally resulting in zero div errors in midprice calcs
+    
+    now skips qty 0 updates
+
+[33mcommit 15cd4ff1eaf30452c30e809d00983873fd873f34[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Wed Sep 20 10:14:30 2023 +0100
+
+    fixed bug causing ob to become unordered
+    
+    now resorts book on snapshot and process updates, inline with bybit ob methods
+
+[33mcommit de766747d14786771ebf53cfad55c8be2e12c073[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Sep 19 12:56:03 2023 +0100
+
+    Update README.md
+
+[33mcommit cb394bca6f059297c3ea5c353bdfc0175aee823d[m
+Merge: 7d31b95 e54ba6f
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Sun Sep 17 17:49:02 2023 +0100
+
+    Merge pull request #4 from LevBeta/main
+    
+    Add pybit to the requirements
+
+[33mcommit e54ba6fddbf60dfac05f70072736311d2c42a3f1[m
+Author: Beta <105949605+LevBeta@users.noreply.github.com>
+Date:   Sun Sep 17 06:28:10 2023 +0100
+
+    Add pybit to the requirements
+
+[33mcommit 7d31b95a77cffb4d4848853d1631f87f98152483[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Fri Sep 15 11:32:39 2023 +0100
+
+    Update README.md
+
+[33mcommit 10ee9511f92f7ec17cf1fd29dfb0f84dc0599c9a[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Thu Sep 14 06:37:01 2023 +0300
+
+    refactoring & new features
+    
+    -significantly improved repo structure & unified bybit/binance market makers
+    
+    -added new features for skew
+    
+    -rebuilt diff function, now far more efficient
+
+[33mcommit 365ca783a4c7da60c68cb77641a63305d0f04707[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Sep 12 20:24:43 2023 +0300
+
+    Update README.md
+
+[33mcommit e53a49238c5546bb7557b2a7bfe6fb3b16b954c7[m
+Author: beatzxbt <121855680+beatzxbt@users.noreply.github.com>
+Date:   Tue Sep 12 20:08:56 2023 +0300
+
+    Update README.md
+
+[33mcommit ede98ea0eda3af8182874293127db51ddb06cac7[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 12:09:41 2023 +0300
+
+    bug fixes
+
+[33mcommit 0ff56ea64eaa4515da7c02c4f3c82f6c5a328f18[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:17:29 2023 +0300
+
+    Update parameters.yaml
+
+[33mcommit 9780289dec2003aad1d76115bf1d654c4b57e534[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:14:33 2023 +0300
+
+    Update parameters.yaml
+
+[33mcommit 771e16df31466abb33fe169e543d97b8a58453d5[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:14:11 2023 +0300
+
+    added ringbuffer for klines
+    
+    - made changes to orderbook class names
+    - added ringbuffer, a class which manages a numpy array of const size efficiently
+    - removed the annoying float(), now much cleaner
+
+[33mcommit 61a500b9b14f780913dc226129205ff7aebe8219[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:11:37 2023 +0300
+
+    Create diff.py
+    
+    - added diff func, now is the sole order router and tries to smartly send orders with as few requests as possible
+    
+    -requires cleaning up/speeding up
+
+[33mcommit 84c6e75a03c914a86f2342eeed39145234652b9f[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:10:02 2023 +0300
+
+    added numba np.abs
+
+[33mcommit ef3de6af210c88e5061cf250d84b2cd4986010f9[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:09:11 2023 +0300
+
+    syncing for position & orders
+    
+    - now syncs all orders and current position every 500ms
+
+[33mcommit 24fd9a4975dac3b16cc702d7ee384cccf84bcddc[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:07:22 2023 +0300
+
+    added data initialization
+    
+    - both trades and klines feeds now initialize
+    - for binance, OB intializes correctly to 500 levels
+    - changed klines interval from 15m to 1m
+
+[33mcommit 4a210069c2fee6aec0bbab60f8e356cd7f60d5a4[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:05:03 2023 +0300
+
+    Update ema.py
+
+[33mcommit ad0d6c5a45c538fc52d440d3999d3ca8f7509948[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:04:43 2023 +0300
+
+    import changes
+
+[33mcommit 66888c92900b0791914fc13fa712d04702ed24f0[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:04:27 2023 +0300
+
+    applying new changes to bybit
+    
+    - applying same MM logic upgrades to bybit (both core and MM)
+
+[33mcommit 5aa1303ff29beb307f5fef870639f5a4480465db[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 11:00:56 2023 +0300
+
+    reworked MM class
+    
+    -better control over order sizing near BBA
+    -added order skew linked to features
+    -changed order submission logic, optimized for diff func
+
+[33mcommit 9c20b0ae7ead5239053c75abffb180093d24c67e[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 10:59:22 2023 +0300
+
+    new features
+    
+    added momentum and spread features
+
+[33mcommit d08db8479e45477221a8036d8f48cdb3d0046058[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Sat Aug 26 10:46:41 2023 +0300
+
+    private client reworked
+
+[33mcommit b656bc5a5c50d45524cbc2058accb5344ef746a8[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Wed Aug 23 11:29:02 2023 +0300
+
+    simplified order client
+    
+    -reduced unnecessary code for various endpoints
+    -new batch amend + batch cancel
+    -simplified endpoints
+    -unified error handling
+
+[33mcommit 81bf28721f95f53d9c796d34d0d56ee8e99bf49c[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Wed Aug 23 11:25:15 2023 +0300
+
+    simplified bybit ws
+    
+    ---
+
+[33mcommit 564034660fee655f9d01a376addb783128e23888[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Wed Aug 23 11:21:15 2023 +0300
+
+    updated handlers
+    
+    -handlers now support initialization
+    -also use base LOB class to simplify bybit LOB
+    -easier management of private feeds
+
+[33mcommit c765a289963619367187364c0cfdcf751c2e6733[m
+Author: beatzxbt <mpatel.vishva@gmail.com>
+Date:   Wed Aug 23 11:16:51 2023 +0300
+
+    moved exchange connectors
+    
+    -easier to differentiate exchange connectors and strategies
+    -abstracted base LOB class
+    -minor simplification changes to binance ws handlers & endpoints

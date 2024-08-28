@@ -1,6 +1,6 @@
 from typing import List
 from src.sharedstate import SharedState
-from src.strategy.ws_feeds.bybitprivatedata import log_event  # Import the logging function
+from src.utils.logmeister import log_event # Import the logging function
 import asyncio
 import logging
 import logging.handlers

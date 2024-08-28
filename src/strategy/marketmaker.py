@@ -7,7 +7,7 @@ from src.strategy.features.generate import Features
 from src.sharedstate import SharedState
 
 import asyncio
-from src.strategy.ws_feeds.bybitprivatedata import log_event 
+from src.utils.logmeister import log_event
 
 class MarketMaker:
     """
