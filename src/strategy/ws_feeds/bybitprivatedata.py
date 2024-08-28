@@ -10,7 +10,7 @@ from src.exchanges.bybit.websockets.handlers.order import BybitOrderHandler
 from src.exchanges.bybit.websockets.handlers.position import BybitPositionHandler
 from src.exchanges.bybit.websockets.private import BybitPrivateWs
 from src.sharedstate import SharedState
-
+from src.strategy.ws_feeds.bybitprivatedata import log_event 
 class BybitPrivateData:
     """
     Manages private data streams from Bybit, including position, execution, and order updates.
@@ -82,7 +82,7 @@ class BybitPrivateData:
             self.position_handler.sync(current_position)
             await asyncio.sleep(10)
 
-    async def _stream_(self) -> Union[Coroutine, None]:
+async def _stream_(self) -> Union[Coroutine, None]:
         """
         Connects to Bybit's combined private WebSocket stream and handles incoming updates.
         """
@@ -102,13 +102,17 @@ class BybitPrivateData:
                     handler = self.topic_handler_map.get(recv["topic"])
 
                     if handler:
-                        handler(recv["data"])
+                        try:  # Wrap message processing in a try...except block
+                            handler(recv["data"])
+                        except Exception as e:
+                            asyncio.create_task(log_event('API_ERROR', f"Bybit Private Feed - Topic: {recv['topic']} - Error: {e}"))
+                            raise e  # Re-raise to handle the error appropriately
 
             except websockets.ConnectionClosed:
                 continue
 
             except Exception as e:
-                print(f"{dt_now()}: Error with bybit private feed: {e}")
+                asyncio.create_task(log_event('API_ERROR', f"Bybit Private Feed - General Error: {e}"))
                 raise e
 
     async def start_feed(self) -> Coroutine:

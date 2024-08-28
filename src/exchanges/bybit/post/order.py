@@ -5,6 +5,7 @@ from src.exchanges.bybit.post.client import BybitPrivatePostClient
 from src.exchanges.bybit.endpoints import PrivatePostLinks
 from src.exchanges.bybit.post.types import BybitFormats
 from src.sharedstate import SharedState
+from src.strategy.ws_feeds.bybitprivatedata import log_event 
 
 class Order:
     """
@@ -113,62 +114,126 @@ class Order:
         """
         return await self.client.submit(self.session, endpoint, payload)
 
+    # async def order_market(self, order: Tuple[str, float]) -> Union[Dict, None]:
+    #     """
+    #     Asynchronously places a market order on Bybit.
+
+    #     Parameters
+    #     ----------
+    #     order : Tuple[str, float]
+    #         The order details, including side ('Buy' or 'Sell') and quantity.
+
+    #     Returns
+    #     -------
+    #     Union[Dict, None]
+    #         The response from Bybit's API if the order is successfully placed; otherwise, None.
+    #     """
+    #     endpoint = self.endpoints.CREATE_ORDER
+    #     side, qty = self._order_to_str_(order)
+    #     payload = self.formats.create_market(side, qty)
+    #     return await self._submit_(endpoint, payload)
     async def order_market(self, order: Tuple[str, float]) -> Union[Dict, None]:
         """
         Asynchronously places a market order on Bybit.
-
-        Parameters
-        ----------
-        order : Tuple[str, float]
-            The order details, including side ('Buy' or 'Sell') and quantity.
-
-        Returns
-        -------
-        Union[Dict, None]
-            The response from Bybit's API if the order is successfully placed; otherwise, None.
         """
         endpoint = self.endpoints.CREATE_ORDER
         side, qty = self._order_to_str_(order)
         payload = self.formats.create_market(side, qty)
-        return await self._submit_(endpoint, payload)
+
+        try:
+            response = await self._submit_(endpoint, payload) 
+            # Handle potential errors in the response (e.g., rejections) 
+            if response is not None and response.get('retCode') != 0:
+                message = f"Error placing market order: {payload}, Response: {response}"
+                asyncio.create_task(log_event('API_ERROR', message))
+            return response
+
+        except Exception as e:
+            message = f"Error in order_market: {e}, Payload: {payload}"
+            asyncio.create_task(log_event('RUNTIME_ERROR', message))
+            return None
+        
+    # async def order_limit(self, order: Tuple[str, float, float]) -> Union[Dict, None]:
+    #     """
+    #     Asynchronously places a limit order on Bybit.
+
+    #     Parameters
+    #     ----------
+    #     order : Tuple[str, float, float]
+    #         The order details, including side ('Buy' or 'Sell'), price, and quantity.
+
+    #     Returns
+    #     -------
+    #     Union[Dict, None]
+    #         The response from Bybit's API if the order is successfully placed; otherwise, None.
+    #     """
+    #     endpoint = self.endpoints.CREATE_ORDER
+    #     side, price, qty = self._order_to_str_(order)
+    #     payload = self.formats.create_limit(side, price, qty)
+    #     return await self._submit_(endpoint, payload)
 
     async def order_limit(self, order: Tuple[str, float, float]) -> Union[Dict, None]:
         """
         Asynchronously places a limit order on Bybit.
-
-        Parameters
-        ----------
-        order : Tuple[str, float, float]
-            The order details, including side ('Buy' or 'Sell'), price, and quantity.
-
-        Returns
-        -------
-        Union[Dict, None]
-            The response from Bybit's API if the order is successfully placed; otherwise, None.
         """
         endpoint = self.endpoints.CREATE_ORDER
         side, price, qty = self._order_to_str_(order)
         payload = self.formats.create_limit(side, price, qty)
-        return await self._submit_(endpoint, payload)
 
+        try:
+            response = await self._submit_(endpoint, payload)
+            # Handle potential errors in the response (e.g., rejections) 
+            if response is not None and response.get('retCode') != 0:
+                message = f"Error placing limit order: {payload}, Response: {response}"
+                asyncio.create_task(log_event('API_ERROR', message))
+            return response
+
+        except Exception as e:
+            message = f"Error in order_limit: {e}, Payload: {payload}"
+            asyncio.create_task(log_event('RUNTIME_ERROR', message))
+            return None
+
+
+    # async def order_limit_batch(self, orders: List[Tuple[str, float, float]]) -> Union[Dict, None]:
+    #     """
+    #     Asynchronously places a batch of limit orders on Bybit.
+
+    #     Parameters
+    #     ----------
+    #     orders : List[Tuple[str, float, float]]
+    #         A list of orders, each including side ('Buy' or 'Sell'), price, and quantity.
+
+    #     Returns
+    #     -------
+    #     Union[Dict, None]
+    #         The response from Bybit's API if the orders are successfully placed; otherwise, None.
+    #     """
+    #     batch_endpoint = self.endpoints.CREATE_BATCH
+    #     tasks = []
+
+    #     # Split the orders into chunks of 10 for batch processing
+    #     for i in range(0, len(orders), 10):
+    #         batch_orders = [self._order_to_str_(order) for order in orders[i:i+10]]
+    #         batch_payload = {
+    #             "category": self.category, 
+    #             "request": [
+    #                 self.formats.create_limit(*order)
+    #                 for order in batch_orders
+    #             ]
+    #         }
+    #         task = asyncio.create_task(self._sessionless_submit_(batch_endpoint, batch_payload))
+    #         tasks.append(task)
+
+    #     result = await asyncio.gather(*tasks)
+    #     await self.close_session()
+    #     return result
     async def order_limit_batch(self, orders: List[Tuple[str, float, float]]) -> Union[Dict, None]:
         """
         Asynchronously places a batch of limit orders on Bybit.
-
-        Parameters
-        ----------
-        orders : List[Tuple[str, float, float]]
-            A list of orders, each including side ('Buy' or 'Sell'), price, and quantity.
-
-        Returns
-        -------
-        Union[Dict, None]
-            The response from Bybit's API if the orders are successfully placed; otherwise, None.
         """
         batch_endpoint = self.endpoints.CREATE_BATCH
         tasks = []
 
-        # Split the orders into chunks of 10 for batch processing
         for i in range(0, len(orders), 10):
             batch_orders = [self._order_to_str_(order) for order in orders[i:i+10]]
             batch_payload = {
@@ -178,50 +243,97 @@ class Order:
                     for order in batch_orders
                 ]
             }
-            task = asyncio.create_task(self._sessionless_submit_(batch_endpoint, batch_payload))
-            tasks.append(task)
+            try: 
+                task = asyncio.create_task(self._sessionless_submit_(batch_endpoint, batch_payload))
+                tasks.append(task)
+            except Exception as e:  # Catch exceptions during task creation/submission
+                message = f"Error placing order batch: {batch_payload}, Reason: {e}"
+                asyncio.create_task(log_event('API_ERROR', message))
 
         result = await asyncio.gather(*tasks)
         await self.close_session()
-        return result
+        return result 
          
+    # async def amend(self, order: Tuple[str, float, float]) -> Union[Dict, None]:
+    #     """
+    #     Asynchronously amends an existing order on Bybit.
+
+    #     Parameters
+    #     ----------
+    #     order : Tuple[str, float, float]
+    #         The order details to be amended, including the order ID, new price, and new quantity.
+
+    #     Returns
+    #     -------
+    #     Union[Dict, None]
+    #         The response from Bybit's API if the order is successfully amended; otherwise, None.
+    #     """
+    #     endpoint = self.endpoints.AMEND_ORDER
+    #     order_id, price, qty = self._order_to_str_(order)
+    #     payload = self.formats.create_amend(order_id, price, qty)
+    #     return await self._submit_(endpoint, payload)
+
     async def amend(self, order: Tuple[str, float, float]) -> Union[Dict, None]:
         """
         Asynchronously amends an existing order on Bybit.
-
-        Parameters
-        ----------
-        order : Tuple[str, float, float]
-            The order details to be amended, including the order ID, new price, and new quantity.
-
-        Returns
-        -------
-        Union[Dict, None]
-            The response from Bybit's API if the order is successfully amended; otherwise, None.
         """
         endpoint = self.endpoints.AMEND_ORDER
         order_id, price, qty = self._order_to_str_(order)
         payload = self.formats.create_amend(order_id, price, qty)
-        return await self._submit_(endpoint, payload)
+
+        try:
+            response = await self._submit_(endpoint, payload)
+            if response is not None and response.get('retCode') != 0:
+                message = f"Error amending order {order_id}: {payload}, Response: {response}"
+                asyncio.create_task(log_event('API_ERROR', message))
+            return response
+
+        except Exception as e:
+            message = f"Error in amend: {e}, Payload: {payload}"
+            asyncio.create_task(log_event('RUNTIME_ERROR', message))
+            return None
+        
+    # async def amend_batch(self, orders: List[Tuple[str, float, float]]) -> Union[Dict, None]:
+    #     """
+    #     Asynchronously amends a batch of existing orders on Bybit.
+
+    #     Parameters
+    #     ----------
+    #     orders : List[Tuple[str, float, float]]
+    #         A list of orders to be amended, each including the order ID, new price, and new quantity.
+
+    #     Returns
+    #     -------
+    #     Union[Dict, None]
+    #         The response from Bybit's API if the orders are successfully amended; otherwise, None.
+    #     """
+    #     batch_endpoint = self.endpoints.AMEND_BATCH
+    #     tasks = []
+
+    #     # Split the orders into chunks of 10 for batch processing
+    #     for i in range(0, len(orders), 10):
+    #         batch_orders = [self._order_to_str_(order) for order in orders[i:i+10]]
+    #         batch_payload = {
+    #             "category": self.category, 
+    #             "request": [
+    #                 self.formats.create_amend(*order)
+    #                 for order in batch_orders
+    #             ]
+    #         }
+    #         task = asyncio.create_task(self._sessionless_submit_(batch_endpoint, batch_payload))
+    #         tasks.append(task)
+
+    #     result = await asyncio.gather(*tasks)
+    #     await self.close_session()
+    #     return result
 
     async def amend_batch(self, orders: List[Tuple[str, float, float]]) -> Union[Dict, None]:
         """
         Asynchronously amends a batch of existing orders on Bybit.
-
-        Parameters
-        ----------
-        orders : List[Tuple[str, float, float]]
-            A list of orders to be amended, each including the order ID, new price, and new quantity.
-
-        Returns
-        -------
-        Union[Dict, None]
-            The response from Bybit's API if the orders are successfully amended; otherwise, None.
         """
         batch_endpoint = self.endpoints.AMEND_BATCH
         tasks = []
 
-        # Split the orders into chunks of 10 for batch processing
         for i in range(0, len(orders), 10):
             batch_orders = [self._order_to_str_(order) for order in orders[i:i+10]]
             batch_payload = {
@@ -231,49 +343,102 @@ class Order:
                     for order in batch_orders
                 ]
             }
-            task = asyncio.create_task(self._sessionless_submit_(batch_endpoint, batch_payload))
-            tasks.append(task)
+            try:
+                task = asyncio.create_task(self._sessionless_submit_(batch_endpoint, batch_payload))
+                tasks.append(task)
+            except Exception as e:  
+                message = f"Error creating amend_batch task: {batch_payload}, Reason: {e}"
+                asyncio.create_task(log_event('RUNTIME_ERROR', message))
 
-        result = await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         await self.close_session()
-        return result
 
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                message = f"Error in amend_batch task {i}: {result}"
+                asyncio.create_task(log_event('API_ERROR', message))
+            elif result is not None and result.get('retCode') != 0:
+                message = f"Error in amend_batch response {i}: {result}"
+                asyncio.create_task(log_event('API_ERROR', message))
+
+        return results
+    
+    # async def cancel(self, order_id: str) -> Union[Dict, None]:
+    #     """
+    #     Asynchronously cancels an existing order on Bybit by order ID.
+
+    #     Parameters
+    #     ----------
+    #     order_id : str
+    #         The ID of the order to cancel.
+
+    #     Returns
+    #     -------
+    #     Union[Dict, None]
+    #         The response from Bybit's API if the order is successfully canceled; otherwise, None.
+    #     """
+    #     endpoint = self.endpoints.CANCEL_SINGLE
+    #     payload = self.formats.create_cancel(order_id)
+    #     return await self._submit_(endpoint, payload)
     async def cancel(self, order_id: str) -> Union[Dict, None]:
-        """
-        Asynchronously cancels an existing order on Bybit by order ID.
+            """
+            Asynchronously cancels an existing order on Bybit by order ID.
+            """
+            endpoint = self.endpoints.CANCEL_SINGLE
+            payload = self.formats.create_cancel(order_id)
 
-        Parameters
-        ----------
-        order_id : str
-            The ID of the order to cancel.
+            try:
+                response = await self._submit_(endpoint, payload)
+                if response is not None and response.get('retCode') != 0:
+                    message = f"Error canceling order {order_id}: {payload}, Response: {response}"
+                    asyncio.create_task(log_event('API_ERROR', message))
+                return response
 
-        Returns
-        -------
-        Union[Dict, None]
-            The response from Bybit's API if the order is successfully canceled; otherwise, None.
-        """
-        endpoint = self.endpoints.CANCEL_SINGLE
-        payload = self.formats.create_cancel(order_id)
-        return await self._submit_(endpoint, payload)
+            except Exception as e:
+                message = f"Error in cancel: {e}, Payload: {payload}"
+                asyncio.create_task(log_event('RUNTIME_ERROR', message))
+                return None
+            
+    # async def cancel_batch(self, order_ids: List[str]) -> Union[Dict, None]:
+    #     """
+    #     Asynchronously cancels a batch of existing orders on Bybit by their order IDs.
+
+    #     Parameters
+    #     ----------
+    #     order_ids : List[str]
+    #         A list of order IDs to cancel.
+
+    #     Returns
+    #     -------
+    #     Union[Dict, None]
+    #         The response from Bybit's API if the orders are successfully canceled; otherwise, None.
+    #     """
+    #     batch_endpoint = self.endpoints.CANCEL_BATCH
+    #     tasks = []
+
+    #     # Split the order IDs into chunks of 10 for batch processing
+    #     for i in range(0, len(order_ids), 10):
+    #         batch_payload = {
+    #             "category": self.category, 
+    #             "request": [
+    #                 self.formats.create_cancel(order_id)
+    #                 for order_id in order_ids[i:i+10]
+    #             ]
+    #         }
+    #         task = asyncio.create_task(self._sessionless_submit_(batch_endpoint, batch_payload))
+    #         tasks.append(task)
+
+    #     result = await asyncio.gather(*tasks)
+    #     await self.close_session()
+    #     return result
 
     async def cancel_batch(self, order_ids: List[str]) -> Union[Dict, None]:
         """
         Asynchronously cancels a batch of existing orders on Bybit by their order IDs.
-
-        Parameters
-        ----------
-        order_ids : List[str]
-            A list of order IDs to cancel.
-
-        Returns
-        -------
-        Union[Dict, None]
-            The response from Bybit's API if the orders are successfully canceled; otherwise, None.
         """
         batch_endpoint = self.endpoints.CANCEL_BATCH
         tasks = []
 
-        # Split the order IDs into chunks of 10 for batch processing
         for i in range(0, len(order_ids), 10):
             batch_payload = {
                 "category": self.category, 
@@ -282,26 +447,60 @@ class Order:
                     for order_id in order_ids[i:i+10]
                 ]
             }
-            task = asyncio.create_task(self._sessionless_submit_(batch_endpoint, batch_payload))
-            tasks.append(task)
+            try:
+                task = asyncio.create_task(self._sessionless_submit_(batch_endpoint, batch_payload))
+                tasks.append(task)
+            except Exception as e:  
+                message = f"Error creating cancel_batch task: {batch_payload}, Reason: {e}"
+                asyncio.create_task(log_event('RUNTIME_ERROR', message))
 
-        result = await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         await self.close_session()
-        return result
+
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                message = f"Error in cancel_batch task {i}: {result}"
+                asyncio.create_task(log_event('API_ERROR', message))
+            elif result is not None and result.get('retCode') != 0:
+                message = f"Error in cancel_batch response {i}: {result}, Order IDs: {order_ids[i:i+10]}"
+                asyncio.create_task(log_event('API_ERROR', message))
+
+        return results
+
+    # async def cancel_all(self) -> Union[Dict, None]:
+    #     """
+    #     Asynchronously cancels all orders for the trading symbol on Bybit.
+
+    #     Returns
+    #     -------
+    #     Union[Dict, None]
+    #         The response from Bybit's API if all orders are successfully canceled; otherwise, None.
+    #     """
+    #     endpoint = self.endpoints.CANCEL_ALL
+    #     payload = self.formats.create_cancel_all()
+    #     return await self._submit_(endpoint, payload)
 
     async def cancel_all(self) -> Union[Dict, None]:
         """
         Asynchronously cancels all orders for the trading symbol on Bybit.
-
-        Returns
-        -------
-        Union[Dict, None]
-            The response from Bybit's API if all orders are successfully canceled; otherwise, None.
         """
         endpoint = self.endpoints.CANCEL_ALL
         payload = self.formats.create_cancel_all()
-        return await self._submit_(endpoint, payload)
-    
+
+        try:
+            response = await self._submit_(endpoint, payload)
+            if response is not None and response.get('retCode') != 0:
+                message = f"Error canceling all orders: {payload}, Response: {response}"
+                asyncio.create_task(log_event('API_ERROR', message))
+            return response
+
+        except Exception as e:
+            message = f"Error in cancel_all: {e}, Payload: {payload}"
+            asyncio.create_task(log_event('RUNTIME_ERROR', message))
+            return None
+        
+
+        
     async def close_session(self) -> None:
         """
         Asynchronously close the current session

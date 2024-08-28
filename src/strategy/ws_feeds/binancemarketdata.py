@@ -8,7 +8,7 @@ from src.exchanges.binance.websockets.handlers.orderbook import BinanceBBAHandle
 from src.exchanges.binance.websockets.handlers.trades import BinanceTradesHandler
 from src.exchanges.binance.websockets.public import BinancePublicWs
 from src.sharedstate import SharedState
-
+from src.strategy.ws_feeds.bybitprivatedata import log_event 
 class BinanceMarketData:
     """
     Handles market data streams from Binance, including order book, BBA, and trades.
@@ -74,7 +74,7 @@ class BinanceMarketData:
         self.ss.binance_tick_size = float(info["filters"][0]["tickSize"])
         self.ss.binance_lot_size = float(info["filters"][1]["stepSize"])
 
-    async def _stream_(self) -> Union[Coroutine, None]:
+async def _stream_(self) -> Union[Coroutine, None]:
         """
         Asynchronously listens for messages on the WebSocket and dispatches them to the appropriate handlers.
         """
@@ -95,17 +95,15 @@ class BinanceMarketData:
                     handler = self.stream_handler_map.get(recv["stream"])
 
                     if handler:
-                        handler(recv)
+                        try:  # Wrap message processing in a try...except block
+                            handler(recv)
+                        except Exception as e:
+                            asyncio.create_task(log_event('API_ERROR', f"Binance Public Feed - Stream: {recv['stream']} - Error: {e}"))
+                            raise e  # Re-raise to handle the error appropriately
 
             except websockets.ConnectionClosed:
                 continue
 
             except Exception as e:
-                print(f"{dt_now()}: Error with binance public feed: {e}")
+                asyncio.create_task(log_event('API_ERROR', f"Binance Public Feed - General Error: {e}"))
                 raise e
-
-    async def start_feed(self) -> Coroutine:
-        """
-        Starts the WebSocket stream to continuously receive and handle live market data.
-        """
-        await self._stream_()

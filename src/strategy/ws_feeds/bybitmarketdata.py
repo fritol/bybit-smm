@@ -11,7 +11,7 @@ from src.exchanges.bybit.websockets.handlers.ticker import BybitTickerHandler
 from src.exchanges.bybit.websockets.handlers.trades import BybitTradesHandler
 from src.exchanges.bybit.websockets.public import BybitPublicWs
 from src.sharedstate import SharedState
-
+from src.strategy.ws_feeds.bybitprivatedata import log_event 
 class BybitMarketData:
     """
     Manages market data streams from Bybit, including order book, BBA, trades, ticker, and kline.
@@ -106,17 +106,15 @@ class BybitMarketData:
                     handler = self.topic_handler_map.get(recv["topic"])
 
                     if handler:
-                        handler(recv)
+                        try:  # Wrap message processing in a try...except block
+                            handler(recv)
+                        except Exception as e:
+                            asyncio.create_task(log_event('API_ERROR', f"Bybit Public Feed - Topic: {recv['topic']} - Error: {e}"))
+                            raise e  # Re-raise to handle the error appropriately
 
             except websockets.ConnectionClosed:
                 continue
 
             except Exception as e:
-                print(f"{dt_now()}: Error with bybit public feed: {e}")
+                asyncio.create_task(log_event('API_ERROR', f"Bybit Public Feed - General Error: {e}"))
                 raise e
-
-    async def start_feed(self) -> Coroutine:
-        """
-        Starts the WebSocket stream to continuously receive and handle live market data.
-        """
-        await self._stream_()

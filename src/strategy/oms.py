@@ -3,7 +3,7 @@ from typing import List, Tuple, Coroutine, Union
 from src.utils.jit_funcs import nbabs
 from src.exchanges.bybit.post.order import Order
 from src.sharedstate import SharedState
-
+from src.strategy.ws_feeds.bybitprivatedata import log_event 
 class OMS:
     """
     Manages the order lifecycle for Bybit, including segregating, amending, and placing orders based on strategy needs.
@@ -76,19 +76,46 @@ class OMS:
         upper = self.__primary_delta__ * (1 + sensitivity)
         return lower < new_delta and upper > new_delta
     
+    # async def amend_orders(self, current_orders: List, new_orders: List) -> Coroutine:
+    #     tasks = [
+    #         asyncio.create_task(Order(self.ss).amend((current[0], new[1], new[2])))
+    #         for current, new in zip(current_orders, new_orders)
+    #         if nbabs(current[2] - new[1]) > self.ss.buffer
+    #     ]
+    #     return await asyncio.gather(*tasks)
+
     async def amend_orders(self, current_orders: List, new_orders: List) -> Coroutine:
-        tasks = [
-            asyncio.create_task(Order(self.ss).amend((current[0], new[1], new[2])))
-            for current, new in zip(current_orders, new_orders)
-            if nbabs(current[2] - new[1]) > self.ss.buffer
-        ]
-        return await asyncio.gather(*tasks)
+            tasks = []
+            for current, new in zip(current_orders, new_orders):
+                if nbabs(current[2] - new[1]) > self.ss.buffer:
+                    try:
+                        tasks.append(asyncio.create_task(Order(self.ss).amend((current[0], new[1], new[2]))))
+                    except Exception as e:
+                        message = f"Error amending order {current[0]}: {e}" 
+                        asyncio.create_task(log_event('RUNTIME_ERROR', message))
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for i, result in enumerate(results):
+                if isinstance(result, Exception):
+                    message = f"Error in amend_orders task {i}: {result}"
+                    asyncio.create_task(log_event('API_ERROR', message))
+            return results
+    
+    # async def replace_orders(self, to_cancel: List, to_send: List) -> Coroutine:
+    #     ids_to_cancel = [order[0] for order in to_cancel]
+    #     tasks = [Order(self.ss).cancel_batch(ids_to_cancel)]
+    #     tasks.append(Order(self.ss).order_limit_batch(to_send))
+    #     return await asyncio.gather(*tasks)
 
     async def replace_orders(self, to_cancel: List, to_send: List) -> Coroutine:
-        ids_to_cancel = [order[0] for order in to_cancel]
-        tasks = [Order(self.ss).cancel_batch(ids_to_cancel)]
-        tasks.append(Order(self.ss).order_limit_batch(to_send))
-        return await asyncio.gather(*tasks)
+            ids_to_cancel = [order[0] for order in to_cancel]
+            try: 
+                await Order(self.ss).cancel_batch(ids_to_cancel)
+            except Exception as e:
+                message = f"Error cancelling orders: {ids_to_cancel}, Reason: {e}"
+                asyncio.create_task(log_event('API_ERROR', message))
+            
+            tasks = [asyncio.create_task(Order(self.ss).order_limit_batch(to_send))]
+            return await asyncio.gather(*tasks)
 
     async def run(self, new_orders: List[Tuple[str, float, float]], spread: float) -> None:
         """

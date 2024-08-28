@@ -6,6 +6,8 @@ from src.utils.jit_funcs import nblinspace, nbgeomspace, nbround, nbabs, nbclip
 from src.strategy.features.generate import Features
 from src.sharedstate import SharedState
 
+import asyncio
+from src.strategy.ws_feeds.bybitprivatedata import log_event 
 
 class MarketMaker:
     """
@@ -62,26 +64,32 @@ class MarketMaker:
         Tuple[float, float]
             The absolute values of bid and ask skew, ensuring they are positive.
         """
-        skew = self.features.generate_skew()
-        skew = nbround(skew, 2) # NOTE: Temporary, prevents heavy OMS use
+        try:
+            skew = self.features.generate_skew()
+            skew = nbround(skew, 2) # NOTE: Temporary, prevents heavy OMS use
 
-        # Set the initial values
-        bid_skew = nbclip(skew, 0, 1)
-        ask_skew = nbclip(skew, -1, 0)  
+            # Set the initial values
+            bid_skew = nbclip(skew, 0, 1)
+            ask_skew = nbclip(skew, -1, 0)  
 
-        # Adjust for current inventory delta 
-        bid_skew += self.ss.inventory_delta if self.ss.inventory_delta < 0 else 0
-        ask_skew -= self.ss.inventory_delta if self.ss.inventory_delta > 0 else 0
+            # Adjust for current inventory delta 
+            bid_skew += self.ss.inventory_delta if self.ss.inventory_delta < 0 else 0
+            ask_skew -= self.ss.inventory_delta if self.ss.inventory_delta > 0 else 0
 
-        # Clip values if inventory reaches extreme levels
-        bid_skew = bid_skew if self.ss.inventory_delta > -self.ss.inventory_extreme else 1
-        ask_skew = ask_skew if self.ss.inventory_delta < self.ss.inventory_extreme else 1
-        
-        # Edge case where skew is extreme for no apparent reason (0 delta is rare here)
-        if (bid_skew == 1 or ask_skew == 1) and (self.ss.inventory_delta == 0):
-            return 0, 0
-        
-        return nbabs(bid_skew), nbabs(ask_skew)
+            # Clip values if inventory reaches extreme levels
+            bid_skew = bid_skew if self.ss.inventory_delta > -self.ss.inventory_extreme else 1
+            ask_skew = ask_skew if self.ss.inventory_delta < self.ss.inventory_extreme else 1
+            
+            # Edge case where skew is extreme for no apparent reason (0 delta is rare here)
+            if (bid_skew == 1 or ask_skew == 1) and (self.ss.inventory_delta == 0):
+                return 0, 0
+            
+            return nbabs(bid_skew), nbabs(ask_skew)
+        except Exception as e:
+                message = f"Error in _prices_ function: {e}"
+                asyncio.create_task(log_event('RUNTIME_ERROR', message))
+                # TODO Pause/restart the strat ?
+                return np.array([], dtype=np.float64), np.array([], dtype=np.float64)
 
     def _adjusted_spread_(self) -> float:
         """
@@ -96,8 +104,13 @@ class MarketMaker:
         float
             The adjusted spread value.
         """
-        multiplier = (self.ss.volatility_value * 100) / self.ss.bybit_mid
-        return self.ss.base_spread * nbclip(multiplier, 1, 10)
+        try:
+            multiplier = (self.ss.volatility_value * 100) / self.ss.bybit_mid
+            return self.ss.base_spread * nbclip(multiplier, 1, 10)
+        except Exception as e:
+            message = f"Error in _adjusted_spread_ function: {e}"
+            asyncio.create_task(log_event('RUNTIME_ERROR', message))
+            return self.ss.base_spread  # Return the base spread as a fallback
 
     def _prices_(self, bid_skew: float, ask_skew: float) -> Tuple[NDArray, NDArray]:
         """
@@ -120,37 +133,45 @@ class MarketMaker:
         Tuple[np.ndarray, np.ndarray]
             Arrays of bid and ask prices.
         """
-        best_bid, best_ask = self.ss.bybit_bba[:, 0]
+        try:
+            best_bid, best_ask = self.ss.bybit_bba[:, 0]
 
-        # Inventory is too short, dont quote asks
-        if bid_skew >= 1:
-            bid_lower = best_bid - (self.spread * self.max_orders)
-            bid_prices = nblinspace(best_bid, bid_lower, self.max_orders)
-            return bid_prices, None
-        
-        # Inventory is too long, dont quote bids
-        elif ask_skew >= 1:
-            ask_upper = best_ask + (self.spread * self.max_orders)
-            ask_prices = nblinspace(best_ask, ask_upper, self.max_orders)
-            return None, ask_prices
 
-        # If skew is normal, quote both sides
-        elif bid_skew >= ask_skew:
-            best_bid = best_ask - self.spread * 0.33
-            best_ask = best_bid + self.spread * 0.67       
-
-        elif bid_skew < ask_skew:
-            best_ask = best_bid + self.spread * 0.33
-            best_bid = best_ask - self.spread * 0.67 
-        
-        base_range = self.ss.volatility_value/2
-        bid_lower = best_bid - (base_range * (1 - bid_skew))
-        ask_upper = best_ask + (base_range * (1 - ask_skew))
+            # Inventory is too short, dont quote asks
+            if bid_skew >= 1:
+                bid_lower = best_bid - (self.spread * self.max_orders)
+                bid_prices = nblinspace(best_bid, bid_lower, self.max_orders)
+                return bid_prices, None
             
-        bid_prices = nbgeomspace(best_bid, bid_lower, self.max_orders/2) + self.ss.price_offset
-        ask_prices = nbgeomspace(best_ask, ask_upper, self.max_orders/2) + self.ss.price_offset
+            # Inventory is too long, dont quote bids
+            elif ask_skew >= 1:
+                ask_upper = best_ask + (self.spread * self.max_orders)
+                ask_prices = nblinspace(best_ask, ask_upper, self.max_orders)
+                return None, ask_prices
 
-        return bid_prices, ask_prices
+            # If skew is normal, quote both sides
+            elif bid_skew >= ask_skew:
+                best_bid = best_ask - self.spread * 0.33
+                best_ask = best_bid + self.spread * 0.67       
+
+            elif bid_skew < ask_skew:
+                best_ask = best_bid + self.spread * 0.33
+                best_bid = best_ask - self.spread * 0.67 
+            
+            base_range = self.ss.volatility_value/2
+            bid_lower = best_bid - (base_range * (1 - bid_skew))
+            ask_upper = best_ask + (base_range * (1 - ask_skew))
+                
+            bid_prices = nbgeomspace(best_bid, bid_lower, self.max_orders/2) + self.ss.price_offset
+            ask_prices = nbgeomspace(best_ask, ask_upper, self.max_orders/2) + self.ss.price_offset
+
+            return bid_prices, ask_prices
+        
+        except Exception as e:
+            message = f"Error in _prices_ function: {e}"
+            asyncio.create_task(log_event('RUNTIME_ERROR', message))
+            # TODO Pause/restart the strat ?
+            return np.array([], dtype=np.float64), np.array([], dtype=np.float64)
 
     def _sizes_(self, bid_skew: float, ask_skew: float) -> Tuple[NDArray, NDArray]:
         """
@@ -172,43 +193,51 @@ class MarketMaker:
         Tuple[np.ndarray, np.ndarray]
             Arrays of sizes for bid and ask orders.
         """
-        # Inventory is too short, dont quote asks
-        if bid_skew >= 1:
-            bid_sizes = np.full(
-                shape=self.max_orders, 
-                fill_value=np.median([self.ss.min_order_size, self.ss.max_order_size / 2])
-            )
-            return bid_sizes, None
+        try:
+            
+            # Inventory is too short, dont quote asks
+            if bid_skew >= 1:
+                bid_sizes = np.full(
+                    shape=self.max_orders, 
+                    fill_value=np.median([self.ss.min_order_size, self.ss.max_order_size / 2])
+                )
+                return bid_sizes, None
+            
+            # Inventory is too long, dont quote bids
+            elif ask_skew >= 1:
+                ask_sizes = np.full(
+                    shape=self.max_orders, 
+                    fill_value=np.median([self.ss.min_order_size, self.ss.max_order_size / 2])
+                )
+                return None, ask_sizes
+
+            # Increased size near best bid, decreased size near furthest bid
+            bid_min = self.ss.min_order_size * (1 + bid_skew**0.5)
+            bid_upper = self.ss.max_order_size * (1 - bid_skew)
+
+            # Increased size near best ask, decreased size near furthest ask
+            ask_min = self.ss.min_order_size * (1 + ask_skew**0.5)
+            ask_upper = self.ss.max_order_size * (1 - ask_skew)
+
+            bid_sizes = nbgeomspace(
+                start=bid_min if bid_skew >= ask_skew else self.ss.min_order_size, 
+                end=bid_upper, 
+                n=self.max_orders/2
+            ) + self.ss.size_offset
+
+            ask_sizes = nbgeomspace(
+                start=ask_min if ask_skew >= bid_skew else self.ss.min_order_size, 
+                end=ask_upper, 
+                n=self.max_orders/2
+            ) + self.ss.size_offset
+
+            return bid_sizes, ask_sizes
         
-        # Inventory is too long, dont quote bids
-        elif ask_skew >= 1:
-            ask_sizes = np.full(
-                shape=self.max_orders, 
-                fill_value=np.median([self.ss.min_order_size, self.ss.max_order_size / 2])
-            )
-            return None, ask_sizes
-
-        # Increased size near best bid, decreased size near furthest bid
-        bid_min = self.ss.min_order_size * (1 + bid_skew**0.5)
-        bid_upper = self.ss.max_order_size * (1 - bid_skew)
-
-        # Increased size near best ask, decreased size near furthest ask
-        ask_min = self.ss.min_order_size * (1 + ask_skew**0.5)
-        ask_upper = self.ss.max_order_size * (1 - ask_skew)
-
-        bid_sizes = nbgeomspace(
-            start=bid_min if bid_skew >= ask_skew else self.ss.min_order_size, 
-            end=bid_upper, 
-            n=self.max_orders/2
-        ) + self.ss.size_offset
-
-        ask_sizes = nbgeomspace(
-            start=ask_min if ask_skew >= bid_skew else self.ss.min_order_size, 
-            end=ask_upper, 
-            n=self.max_orders/2
-        ) + self.ss.size_offset
-
-        return bid_sizes, ask_sizes
+        except Exception as e:
+            message = f"Error in _prices_ function: {e}"
+            asyncio.create_task(log_event('RUNTIME_ERROR', message))
+            # TODO Pause/restart the strat ?
+            return np.array([], dtype=np.float64), np.array([], dtype=np.float64)
 
     def generate_quotes(self, debug=False) -> List[Tuple[str, float, float]]:
         """
@@ -224,29 +253,34 @@ class MarketMaker:
         List[Tuple[str, float, float]]
             A list of quotes, where each quote is a tuple containing the side, price, and size.
         """
-        bid_skew, ask_skew = self._skew_()
-        bid_prices, ask_prices = self._prices_(bid_skew, ask_skew)
-        bid_sizes, ask_sizes = self._sizes_(bid_skew, ask_skew)
+        try:
+            bid_skew, ask_skew = self._skew_()
+            bid_prices, ask_prices = self._prices_(bid_skew, ask_skew)
+            bid_sizes, ask_sizes = self._sizes_(bid_skew, ask_skew)
 
-        bids, asks = [], []
+            bids, asks = [], []
 
-        if isinstance(bid_prices, np.ndarray):
-            bids = [
-                ["Buy", round_step(price, self.tick_size), round_step(size, self.lot_size)]
-                for price, size in zip(bid_prices, bid_sizes)
-            ]
-        
-        if isinstance(ask_prices, np.ndarray):
-            asks = [
-                ["Sell", round_step(price, self.tick_size), round_step(size, self.lot_size)]
-                for price, size in zip(ask_prices, ask_sizes)
-            ]
+            if isinstance(bid_prices, np.ndarray):
+                bids = [
+                    ["Buy", round_step(price, self.tick_size), round_step(size, self.lot_size)]
+                    for price, size in zip(bid_prices, bid_sizes)
+                ]
+            
+            if isinstance(ask_prices, np.ndarray):
+                asks = [
+                    ["Sell", round_step(price, self.tick_size), round_step(size, self.lot_size)]
+                    for price, size in zip(ask_prices, ask_sizes)
+                ]
 
-        if debug:
-            print("-----------------------------")
-            print(f"Skews: {bid_skew} |  {ask_skew}")
-            print(f"Inventory: {self.ss.inventory_delta}")
-            print(f"Bids: {bids}")
-            print(f"Asks: {asks}")
+            if debug:
+                print("-----------------------------")
+                print(f"Skews: {bid_skew} |  {ask_skew}")
+                print(f"Inventory: {self.ss.inventory_delta}")
+                print(f"Bids: {bids}")
+                print(f"Asks: {asks}")
 
-        return bids + asks, self.spread
+            return bids + asks, self.spread
+        except Exception as e:
+                message = f"Error in generate_quotes function: {e}"
+                asyncio.create_task(log_event('RUNTIME_ERROR', message))
+                return [], self.spread  # Return an empty list of quotes and the spread
