@@ -1,7 +1,3 @@
-import orjson
-import websockets
-from typing import Coroutine, Union
-
 from src.utils.misc import datetime_now as dt_now
 from src.exchanges.bybit.get.public import BybitPublicClient
 from src.exchanges.bybit.endpoints import WsStreamLinks
@@ -12,6 +8,11 @@ from src.exchanges.bybit.websockets.handlers.trades import BybitTradesHandler
 from src.exchanges.bybit.websockets.public import BybitPublicWs
 from src.sharedstate import SharedState
 from src.utils.logmeister import log_event
+import orjson
+import websockets
+from typing import Coroutine, Union
+
+
 class BybitMarketData:
     """
     Manages market data streams from Bybit, including order book, BBA, trades, ticker, and kline.
