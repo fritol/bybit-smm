@@ -119,3 +119,8 @@ class BybitMarketData:
             except Exception as e:
                 asyncio.create_task(log_event('API_ERROR', f"Bybit Public Feed - General Error: {e}"))
                 raise e
+    async def start_feed(self) -> Coroutine:
+        """
+        Starts the WebSocket stream to continuously receive and handle live market data.
+        """
+        await self._stream_()
