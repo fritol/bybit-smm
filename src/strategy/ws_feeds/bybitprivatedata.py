@@ -115,11 +115,11 @@ async def _stream_(self) -> Union[Coroutine, None]:
                 asyncio.create_task(log_event('API_ERROR', f"Bybit Private Feed - General Error: {e}"))
                 raise e
 
-    async def start_feed(self) -> Coroutine:
-        """
-        Initiates the streaming and synchronization of live private market data from Bybit.
-        """
-        await asyncio.gather(
-            asyncio.create_task(self._sync_()),
-            asyncio.create_task(self._stream_())
-        )
+async def start_feed(self) -> Coroutine:
+    """
+    Initiates the streaming and synchronization of live private market data from Bybit.
+    """
+    await asyncio.gather(
+        asyncio.create_task(self._sync_()),
+        asyncio.create_task(self._stream_())
+    )
