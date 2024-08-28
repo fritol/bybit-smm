@@ -1,8 +1,3 @@
-import asyncio
-import orjson
-import websockets
-from typing import Coroutine, Union
-
 from src.utils.misc import datetime_now as dt_now
 from src.exchanges.bybit.get.private import BybitPrivateGet
 from src.exchanges.bybit.endpoints import WsStreamLinks
@@ -11,6 +6,10 @@ from src.exchanges.bybit.websockets.handlers.position import BybitPositionHandle
 from src.exchanges.bybit.websockets.private import BybitPrivateWs
 from src.sharedstate import SharedState
 from src.utils.logmeister import log_event
+import asyncio
+import orjson
+import websockets
+from typing import Coroutine, Union
 class BybitPrivateData:
     """
     Manages private data streams from Bybit, including position, execution, and order updates.
@@ -116,10 +115,10 @@ async def _stream_(self) -> Union[Coroutine, None]:
                 raise e
 
 async def start_feed(self) -> Coroutine:
-    """
-    Initiates the streaming and synchronization of live private market data from Bybit.
-    """
-    await asyncio.gather(
-        asyncio.create_task(self._sync_()),
-        asyncio.create_task(self._stream_())
-    )
+        """
+        Initiates the streaming and synchronization of live private market data from Bybit.
+        """
+        await asyncio.gather(
+            asyncio.create_task(self._sync_()),
+            asyncio.create_task(self._stream_())
+        )
