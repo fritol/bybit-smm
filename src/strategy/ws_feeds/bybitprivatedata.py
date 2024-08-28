@@ -81,44 +81,44 @@ class BybitPrivateData:
             self.position_handler.sync(current_position)
             await asyncio.sleep(10)
 
-async def _stream_(self) -> Union[Coroutine, None]:
-        """
-        Connects to Bybit's combined private WebSocket stream and handles incoming updates.
-        """
-        print(f"{dt_now()}: Connected to {self.ws_topics} bybit feeds...")
+    async def _stream_(self) -> Union[Coroutine, None]:
+            """
+            Connects to Bybit's combined private WebSocket stream and handles incoming updates.
+            """
+            print(f"{dt_now()}: Connected to {self.ws_topics} bybit feeds...")
 
-        async for websocket in websockets.connect(WsStreamLinks.COMBINED_PRIVATE_STREAM):
-            try:
-                await websocket.send(self.private_ws.authentication())
-                await websocket.send(self.ws_req)
+            async for websocket in websockets.connect(WsStreamLinks.COMBINED_PRIVATE_STREAM):
+                try:
+                    await websocket.send(self.private_ws.authentication())
+                    await websocket.send(self.ws_req)
 
-                while True:
-                    recv = orjson.loads(await websocket.recv())
+                    while True:
+                        recv = orjson.loads(await websocket.recv())
 
-                    if "success" in recv:
-                        continue
+                        if "success" in recv:
+                            continue
 
-                    handler = self.topic_handler_map.get(recv["topic"])
+                        handler = self.topic_handler_map.get(recv["topic"])
 
-                    if handler:
-                        try:  # Wrap message processing in a try...except block
-                            handler(recv["data"])
-                        except Exception as e:
-                            asyncio.create_task(log_event('API_ERROR', f"Bybit Private Feed - Topic: {recv['topic']} - Error: {e}"))
-                            raise e  # Re-raise to handle the error appropriately
+                        if handler:
+                            try:  # Wrap message processing in a try...except block
+                                handler(recv["data"])
+                            except Exception as e:
+                                asyncio.create_task(log_event('API_ERROR', f"Bybit Private Feed - Topic: {recv['topic']} - Error: {e}"))
+                                raise e  # Re-raise to handle the error appropriately
 
-            except websockets.ConnectionClosed:
-                continue
+                except websockets.ConnectionClosed:
+                    continue
 
-            except Exception as e:
-                asyncio.create_task(log_event('API_ERROR', f"Bybit Private Feed - General Error: {e}"))
-                raise e
+                except Exception as e:
+                    asyncio.create_task(log_event('API_ERROR', f"Bybit Private Feed - General Error: {e}"))
+                    raise e
 
-async def start_feed(self) -> Coroutine:
-        """
-        Initiates the streaming and synchronization of live private market data from Bybit.
-        """
-        await asyncio.gather(
-            asyncio.create_task(self._sync_()),
-            asyncio.create_task(self._stream_())
-        )
+    async def start_feed(self) -> Coroutine:
+            """
+            Initiates the streaming and synchronization of live private market data from Bybit.
+            """
+            await asyncio.gather(
+                asyncio.create_task(self._sync_()),
+                asyncio.create_task(self._stream_())
+            )
